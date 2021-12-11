@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import sendIcon from "~/assets/send.svg";
 import moment from "moment";
 import ChatItem from "~/components/ChatItem";
+import { sendMessage, socket } from "~/service";
+
 const ChatList = (props) => {
   const messageEl = useRef(null);
   const [chats, setChats] = useState([]);
@@ -26,16 +28,30 @@ const ChatList = (props) => {
   const handleSubmit = (event) => {
     if ((event.key === "Enter" || event.type === "click") && newMsg !== "") {
       const msgObject = {
-        text: newMsg,
-        sender: "user",
-        time: moment(new Date()).format("h:mm"),
+        receiver: "javid@mail.com",
+        message: newMsg,
       };
-      setMessages((prevMsg) => [...prevMsg, msgObject]);
+      sendMessage(msgObject, (msg) => {
+        handleNewMessage(msg);
+      });
       setNewMsg("");
     }
   };
 
-  useEffect(() => {}, []);
+  const handleNewMessage = (msg) => {
+    console.log("Message received:", msg);
+    if (msg.sender == "javid@mail.com" || msg.receiver == "javid@mail.com")
+      setMessages((prevMsg) => [...prevMsg, msg]);
+    else {
+      // TODO: add notification
+    }
+  };
+
+  useEffect(() => {
+    socket.on("message", (data) => {
+      handleNewMessage(data.data);
+    });
+  }, []);
 
   return (
     <div className="root-container ">
@@ -59,10 +75,14 @@ const ChatList = (props) => {
               {messages.map((m, i) => (
                 <div
                   key={i}
-                  className={`msg${m.sender === "user" ? " dark" : ""}`}
+                  className={`msg${
+                    m.sender === "ziya@mail.com" ? " dark" : ""
+                  }`}
                 >
-                  <p className="msg-content">{m.text}</p>
-                  <p className="msg-timestamp">{m.time}</p>
+                  <p className="msg-content">{m.message}</p>
+                  <p className="msg-timestamp">
+                    {moment(new Date(m.sendDate)).format("h:mm")}
+                  </p>
                 </div>
               ))}
             </div>
