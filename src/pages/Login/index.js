@@ -1,47 +1,73 @@
-import React from "react";
-import { Container, TextField, Button } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import {
+  Container,
+  TextField,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContentText,
+  DialogContent,
+  useScrollTrigger,
+} from "@material-ui/core";
 import { Link, useHistory } from "react-router-dom";
+import { login, socket } from "~/service";
 
 const Login = (props) => {
   const history = useHistory();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogContent, setDialogContent] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  socket.on("connect", () => {
+    window.sessionStorage.setItem("email", email);
+    window.sessionStorage.setItem("password", password);
+    history.push("/landing");
+  });
+  socket.on("connect_error", (err) => {
+    console.log("Socket IO connect error.", err);
+    if (err == "Error: xhr poll error") {
+      setDialogTitle("Error!");
+      setDialogContent("Wrong email or password");
+      setDialogOpen(true);
+      socket.disconnect();
+      // TODO: Login failed (probably). Show wrong email or password message
+    }
+  });
+
   const submit = (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const displayName = e.target.name.value;
-    const password = e.target.password.value;
-    history.push("/chat-list");
-    // signin({ email, password, remember })
-    //     .then(() => (window.location.href = "/"))
-    //     .catch((response) => {
-    //         sessionStorage.setItem("email", email);
-    //         setError(
-    //             <div className={classes.uiMessage}>
-    //                 {response.data.error === "INCORRECT_PASSWORD" ? (
-    //                     <>
-    //                         Incorrect password. Please try again or you
-    //                         can&nbsp;
-    //                         <Link to="#" style={{ color: "inherit" }}>
-    //                             reset your password
-    //                         </Link>
-    //                         .
-    //                     </>
-    //                 ) : (
-    //                     <>
-    //                         Sorry, we can&apos;t find an account with this
-    //                         email address. Please try again or&nbsp;
-    //                         <Link to="/" style={{ color: "inherit" }}>
-    //                             create a new account
-    //                         </Link>
-    //                         .
-    //                     </>
-    //                 )}
-    //             </div>
-    //         );
-    //     });
+    setEmail(e.target.email.value);
+    setPassword(e.target.password.value);
+    login(email, password);
+  };
+  const handleClose = () => {
+    setDialogTitle("");
+    setDialogContent("");
+    setDialogOpen(false);
   };
   return (
     <div className="root-container ">
       <div className="inner-content row">
+        <Dialog
+          open={dialogOpen}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{dialogTitle}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {dialogContent}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} autoFocus>
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
         <div className="form-box">
           <Container maxWidth="xs" className="form-container">
             <h3 className="form-title">Welcome to WassUp</h3>

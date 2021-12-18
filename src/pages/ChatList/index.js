@@ -1,42 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import sendIcon from "~/assets/send.svg";
 import moment from "moment";
+import React, { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import ChatItem from "~/components/ChatItem";
-import { sendMessage, socket } from "~/service";
-
+import { sendMessage, getChats, getMessages, login } from "~/service";
 const ChatList = (props) => {
   const messageEl = useRef(null);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
-
-  useEffect(() => {
-    if (messageEl) {
-      messageEl.current.addEventListener("DOMNodeInserted", (event) => {
-        const { currentTarget: target } = event;
-        target.scroll({ top: target.scrollHeight, behavior: "smooth" });
-      });
-    }
-    //delete after api
-    const obj = {
-      title: "Senior Project",
-      content: "I hate this life...",
-      time: moment(new Date()).format("h:mm"),
-    };
-    setChats((prevMsg) => [...prevMsg, obj]);
-  }, []);
-  const handleSubmit = (event) => {
-    if ((event.key === "Enter" || event.type === "click") && newMsg !== "") {
-      const msgObject = {
-        receiver: "javid@mail.com",
-        message: newMsg,
-      };
-      sendMessage(msgObject, (msg) => {
-        handleNewMessage(msg);
-      });
-      setNewMsg("");
-    }
-  };
 
   const handleNewMessage = (msg) => {
     console.log("Message received:", msg);
@@ -46,63 +17,40 @@ const ChatList = (props) => {
       // TODO: add notification
     }
   };
-
+  const getChatContent = (id) => {
+    console.log(id);
+    getMessages(id, (content) => {
+      props.onChatChange(content);
+    });
+  };
   useEffect(() => {
-    socket.on("message", (data) => {
-      handleNewMessage(data.data);
+    login(window.sessionStorage.email, window.sessionStorage.password);
+    getChats((data) => {
+      setChats(data.messages);
     });
   }, []);
 
   return (
-    <div className="root-container ">
-      <div className="inner-content row">
-        <div className="row chatList-main-container">
-          <div className="col-4 chat-list">
-            <div className="header">Header</div>
-            <div className="chats">
-              {chats.map((chat, index) => (
-                <ChatItem
-                  key={index}
-                  title={chat.title}
-                  time={chat.time}
-                  content={chat.content}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="col chat">
-            <div className="messages" ref={messageEl}>
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`msg${
-                    m.sender === "ziya@mail.com" ? " dark" : ""
-                  }`}
-                >
-                  <p className="msg-content">{m.message}</p>
-                  <p className="msg-timestamp">
-                    {moment(new Date(m.sendDate)).format("h:mm")}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className="footer">
-              <input
-                className="msg-input"
-                type="text"
-                value={newMsg}
-                onChange={(e) => setNewMsg(e.target.value)}
-                onKeyUp={(e) => {
-                  handleSubmit(e);
-                }}
-                placeholder="Type here..."
-              />
-              <img onClick={(e) => handleSubmit(e)} src={sendIcon} />
-            </div>
-          </div>
+    <div className="chats">
+      {chats.map((chat) => (
+        <div key={chat.id} onClick={() => getChatContent(chat.receiver)}>
+          <ChatItem
+            id={chat.id}
+            receiver={chat.receiver}
+            sender={chat.sender}
+            sendDate={moment(chat.sendDate).format("h:mm")}
+            status={chat.status}
+            content={chat.body}
+            onOption={props.onChatDelete}
+          />
         </div>
-      </div>
+      ))}
     </div>
   );
+};
+
+ChatList.propTypes = {
+  onChatChange: PropTypes.any,
+  onChatDelete: PropTypes.func,
 };
 export default ChatList;

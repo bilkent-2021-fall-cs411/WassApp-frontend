@@ -72,8 +72,8 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border-radius: 10px;
-  width: 70%;
-  height: 80vh;
+  width: 95%;
+  height: 85vh;
 }
 
 .chat-list {
@@ -179,6 +179,18 @@
 }
 .msg-content {
   margin: 0;
+  display: contents;
+  font-size: 14px;
+}
+.msg-last {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin: auto;
+  white-space: nowrap;
+}
+.msg-status {
+  font-size: 29px;
+  margin-right: 2px;
 }
 .msg-timestamp {
   float: right;
@@ -200,4 +212,37 @@
   padding: 5%;
   background: white;
   border-bottom: 1px solid #ddd;
+}
+li {
+  flex: 1;
+}
+.nav-link {
+  background-color: rgba(255, 255, 255, 0.65);
+  color: black;
+  text-align: center !important;
+}
+.nav-link.active {
+  background-color: white !important;
+  color: #0738a1 !important;
+}
+.chat-dropdown {
+  font-size: 30px;
+  margin: 0px 0 0 11px;
+}
+.contact-item-icon {
+  font-size: 20px;
+  margin: 5px 7px;
+}
+.chat-warning {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+.chat-container {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  overflow: hidden;
 }

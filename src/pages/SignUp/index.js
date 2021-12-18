@@ -1,43 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Container, TextField, Button } from "@material-ui/core";
 import { Link, withRouter, useHistory } from "react-router-dom";
+import { register, socket } from "~/service";
 
-const SignUp = (props) => {
+const SignUp = () => {
   const history = useHistory();
   const submit = (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const displayName = e.target.name.value;
-    const password = e.target.password.value;
+    const user = {
+      email: e.target.email.value,
+      displayName: e.target.name.value,
+      password: e.target.password.value,
+    };
+    register(user, (res) => {
+      handleRegister(res);
+    });
+  };
+  const handleRegister = (res) => {
+    console.log(res);
     history.push("/chat-list");
-    // signin({ email, password, remember })
-    //     .then(() => (window.location.href = "/"))
-    //     .catch((response) => {
-    //         sessionStorage.setItem("email", email);
-    //         setError(
-    //             <div className={classes.uiMessage}>
-    //                 {response.data.error === "INCORRECT_PASSWORD" ? (
-    //                     <>
-    //                         Incorrect password. Please try again or you
-    //                         can&nbsp;
-    //                         <Link to="#" style={{ color: "inherit" }}>
-    //                             reset your password
-    //                         </Link>
-    //                         .
-    //                     </>
-    //                 ) : (
-    //                     <>
-    //                         Sorry, we can&apos;t find an account with this
-    //                         email address. Please try again or&nbsp;
-    //                         <Link to="/" style={{ color: "inherit" }}>
-    //                             create a new account
-    //                         </Link>
-    //                         .
-    //                     </>
-    //                 )}
-    //             </div>
-    //         );
-    //     });
   };
   return (
     <div className="root-container ">

@@ -1,19 +1,80 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
+import {
+  IoCheckmarkDoneOutline,
+  IoCheckmark,
+  IoChevronDownOutline,
+} from "react-icons/io5";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 const ChatItem = (props) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <div className="chat-item">
       <div className="chat-header">
-        <h4 style={{ fontSize: "17px" }}>{props.title}</h4>
-        <p className="msg-timestamp">{props.time}</p>
+        <h4 style={{ fontSize: "17px" }}>{props.receiver}</h4>
+        <p className="msg-timestamp">{props.sendDate}</p>
       </div>
-      <p className="msg-content">{props.content}</p>
+      <div className="chat-header">
+        <div className="msg-content">
+          {props.status === "SENT" ? (
+            <IoCheckmarkDoneOutline className="msg-status" />
+          ) : (
+            <IoCheckmark className="msg-status" />
+          )}
+          <p className="msg-last">{props.content}</p>
+        </div>
+        <div>
+          <IoChevronDownOutline
+            className="chat-dropdown"
+            id="basic-button"
+            aria-controls="basic-menu"
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick(e);
+            }}
+          />
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onOption(props.receiver);
+                handleClose(e);
+              }}
+            >
+              Delete Chat
+            </MenuItem>
+          </Menu>
+        </div>
+      </div>
     </div>
   );
 };
 ChatItem.propTypes = {
-  title: PropTypes.any,
-  time: PropTypes.any,
+  receiver: PropTypes.any,
+  sender: PropTypes.any,
   content: PropTypes.any,
+  status: PropTypes.any,
+  sendDate: PropTypes.any,
+  id: PropTypes.any,
+  onOption: PropTypes.func,
 };
 export default ChatItem;
