@@ -20,7 +20,7 @@ const ChatItem = (props) => {
   return (
     <div className="chat-item">
       <div className="chat-header">
-        <h4 style={{ fontSize: "17px" }}>{props.to}</h4>
+        <h4 style={{ fontSize: "17px" }}>{props.otherUser.displayName}</h4>
         <p className="msg-timestamp">{props.sendDate}</p>
       </div>
       <div className="chat-header">
@@ -55,7 +55,7 @@ const ChatItem = (props) => {
               <MenuItem
                 onClick={(e) => {
                   e.stopPropagation();
-                  props.onOption(props.receiver);
+                  props.onOption(props.otherUser.email);
                   handleClose(e);
                 }}
               >
@@ -69,13 +69,11 @@ const ChatItem = (props) => {
   );
 };
 ChatItem.propTypes = {
-  receiver: PropTypes.any,
-  sender: PropTypes.any,
   content: PropTypes.any,
   status: PropTypes.any,
   sendDate: PropTypes.any,
   id: PropTypes.any,
-  to: PropTypes.any,
+  otherUser: PropTypes.any,
   onOption: PropTypes.func,
 };
 export default ChatItem;

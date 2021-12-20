@@ -45,12 +45,8 @@ const Chat = (props) => {
   };
 
   const handleNewMessage = (msg) => {
-    console.log(msg);
     if (msg.sender == props.receiver || msg.receiver == props.receiver)
       setMessages((prevMsg) => [...prevMsg, msg]);
-    else {
-      // TODO: add notification
-    }
   };
 
   useEffect(() => {

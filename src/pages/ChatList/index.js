@@ -3,10 +3,12 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ChatItem from "~/components/ChatItem";
 import { getChats, deleteChatHistory, getMessages } from "~/service";
+
 const ChatList = (props) => {
   const [chats, setChats] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const [notifications, setNotifications] = useState({});
   useEffect(() => {
     const results = chats.filter(
       (chat) =>
@@ -58,13 +60,12 @@ const ChatList = (props) => {
             >
               <ChatItem
                 id={chat.lastMessage.id}
-                receiver={chat.lastMessage.receiver}
-                sender={chat.lastMessage.sender}
-                to={chat.otherUser.displayName}
+                otherUser={chat.otherUser}
                 sendDate={moment(chat.lastMessage.sendDate).format("h:mm")}
                 status={chat.lastMessage.status}
                 content={chat.lastMessage.body}
                 onOption={handleChatDelete}
+                notifications={notifications[chat.otherUser.email]}
               />
             </div>
           ))}

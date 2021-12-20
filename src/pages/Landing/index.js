@@ -5,6 +5,11 @@ import ContactList from "../ContactList";
 import RequestList from "../RequestList";
 import ContactSearch from "../ContactSearch";
 import { useHistory } from "react-router-dom";
+import Badge from "@mui/material/Badge";
+import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import ContactsIcon from "@mui/icons-material/Contacts";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { getMessages, login, logout, socket } from "~/service";
 import {
   IoPersonAddOutline,
@@ -17,12 +22,11 @@ import {
 const Landing = () => {
   const history = useHistory();
 
-  //#a60000
   const [currenctChat, setCurrentChat] = useState(null);
   const [receiver, setReceiver] = useState();
   const [chatNotification, setChatNotification] = useState(0);
   const [contactNotification, setContactNotification] = useState(0);
-  const [requestNotification, setRequestNotification] = useState(0);
+  const [requestNotification, setRequestNotification] = useState(9999);
   const handleChatSelect = (content, email) => {
     setReceiver(email);
     setCurrentChat(content);
@@ -96,11 +100,13 @@ const Landing = () => {
                   aria-controls="chatlist"
                   aria-selected="true"
                 >
-                  <IoChatbubblesOutline
-                    className={
-                      "nav-icon" + chatNotification ? " notified" : null
-                    }
-                  />
+                  {chatNotification > 0 ? (
+                    <Badge badgeContent={chatNotification} color="primary">
+                      <ChatBubbleIcon color="action" />
+                    </Badge>
+                  ) : (
+                    <ChatBubbleIcon color="action" />
+                  )}
                 </a>
               </li>
               <li className="nav-item" role="presentation">
@@ -113,11 +119,13 @@ const Landing = () => {
                   aria-controls="contacts"
                   aria-selected="false"
                 >
-                  <IoPeopleCircleOutline
-                    className={
-                      "nav-icon" + contactNotification ? " notified" : null
-                    }
-                  />
+                  {contactNotification > 0 ? (
+                    <Badge badgeContent={contactNotification} color="primary">
+                      <ContactsIcon color="action" />
+                    </Badge>
+                  ) : (
+                    <ContactsIcon color="action" />
+                  )}
                 </a>
               </li>
               <li className="nav-item" role="presentation">
@@ -130,11 +138,15 @@ const Landing = () => {
                   aria-controls="req"
                   aria-selected="false"
                 >
-                  <IoPersonAddOutline
-                    className={
-                      "nav-icon" + requestNotification ? " notified" : null
-                    }
-                  />
+                  <div style={{ position: "relative" }}>
+                    {requestNotification > 0 ? (
+                      <Badge badgeContent={requestNotification} color="primary">
+                        <PersonAddIcon color="action" />
+                      </Badge>
+                    ) : (
+                      <PersonAddIcon color="action" />
+                    )}
+                  </div>
                 </a>
               </li>
               <li className="nav-item" role="presentation">
@@ -147,7 +159,7 @@ const Landing = () => {
                   aria-controls="search"
                   aria-selected="false"
                 >
-                  <IoSearchOutline />
+                  <PersonSearchIcon color="action" />
                 </a>
               </li>
             </ul>
