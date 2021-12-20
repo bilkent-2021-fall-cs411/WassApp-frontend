@@ -1,33 +1,20 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import sendIcon from "~/assets/send.svg";
 import PropTypes from "prop-types";
 import moment from "moment";
-import {
-  sendMessage,
-  deleteMessage,
-  getMessages,
-  socket,
-  login,
-} from "~/service";
+import { sendMessage, deleteMessage, getMessages, socket } from "~/service";
 import { IoChevronDownOutline } from "react-icons/io5";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 const Chat = (props) => {
-  const messageEl = useCallback((node) => {
-    if (node !== null) {
-      console.log("eventlistener added", node);
-      node.addEventListener("DOMNodeInserted", (event) => {
-        const { currentTarget: target } = event;
-        console.log(event);
-        target.scroll({ top: target.scrollHeight, behaviour: "smooth" });
-      });
-    }
-  }, []);
+  const messagesEndRef = useRef(null);
+
   const [messages, setMessages] = useState(null);
   const [newMsg, setNewMsg] = useState("");
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -67,7 +54,6 @@ const Chat = (props) => {
   };
 
   useEffect(() => {
-    login(window.sessionStorage.email, window.sessionStorage.password);
     setMessages(props.content);
     socket.on("message", (data) => {
       console.log(data);
@@ -75,11 +61,15 @@ const Chat = (props) => {
     });
   }, [props.content]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView();
+  }, [messages]);
+
   return (
     <div className=" chat">
       {messages !== null ? (
         <div className="chat-container">
-          <div className="messages" ref={messageEl}>
+          <div className="messages">
             {messages.map((m, i) => (
               <div
                 key={i}
@@ -128,6 +118,11 @@ const Chat = (props) => {
                 </p>
               </div>
             ))}
+            <div
+              ref={messagesEndRef}
+              className="msg"
+              style={{ width: 0, padding: 0 }}
+            />
           </div>
           <div className="footer">
             <input

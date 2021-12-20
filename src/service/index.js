@@ -19,15 +19,16 @@ export async function register(user, handleResponse) {
 }
 
 export function login(email, password) {
+  window.sessionStorage.setItem("email", email);
+  window.sessionStorage.setItem("password", password);
+
   socket.io.opts.query = { email, password };
   socket.connect();
 }
 
 export function logout() {
   socket.disconnect();
-  window.sessionStorage.email = "";
-  window.sessionStorage.password = "";
-  // TODO: Erase local storage
+  window.sessionStorage.clear();
 }
 
 // Functions for sending an event to the server

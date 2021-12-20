@@ -3,9 +3,8 @@ import { Route, Switch, withRouter } from "react-router-dom";
 import Login from "~/pages/Login";
 import SignUp from "~/pages/SignUp";
 import Landing from "~/pages/Landing";
-import ChatList from "~/pages/ChatList";
 
-const MainRouter = (props) => {
+const MainRouter = () => {
   return (
     <Switch>
       <Route exact path="/" component={Login} />

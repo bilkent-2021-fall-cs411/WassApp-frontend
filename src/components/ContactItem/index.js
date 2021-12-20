@@ -6,7 +6,7 @@ import {
   IoCloseCircleOutline,
   IoCheckmarkCircleOutline,
 } from "react-icons/io5";
-import { sendMessageRequest, login } from "~/service";
+import { sendMessageRequest } from "~/service";
 
 const ContactItem = (props) => {
   const [btnMsg, setBtnMsg] = useState("Send Request");
@@ -14,7 +14,6 @@ const ContactItem = (props) => {
   useEffect(() => {
     console.log(props);
     if (props.isMsgReqSent) setBtnMsg("Request Sent");
-    login(window.sessionStorage.email, window.sessionStorage.password);
   }, []);
 
   const onRequest = (email) => {

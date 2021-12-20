@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { deleteContact, getContacts, login } from "~/service";
+import { deleteContact, getContacts } from "~/service";
 
 import ContactItem from "~/components/ContactItem";
 const ContactList = (props) => {
@@ -33,7 +33,6 @@ const ContactList = (props) => {
   };
 
   useEffect(() => {
-    login(window.sessionStorage.email, window.sessionStorage.password);
     getContactList();
   }, []);
 

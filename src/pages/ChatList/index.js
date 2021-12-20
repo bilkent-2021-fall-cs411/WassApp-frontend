@@ -2,7 +2,7 @@ import moment from "moment";
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ChatItem from "~/components/ChatItem";
-import { getChats, deleteChatHistory, getMessages, login } from "~/service";
+import { getChats, deleteChatHistory, getMessages } from "~/service";
 const ChatList = (props) => {
   const [chats, setChats] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,7 +37,6 @@ const ChatList = (props) => {
     });
   };
   useEffect(() => {
-    login(window.sessionStorage.email, window.sessionStorage.password);
     getChatList();
   }, []);
 

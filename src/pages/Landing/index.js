@@ -13,16 +13,10 @@ import {
   IoSearchOutline,
   IoLogOutOutline,
 } from "react-icons/io5";
+
 const Landing = () => {
   const history = useHistory();
-  socket.on("disconnect", () => {
-    console.log("bye");
-    history.push("/");
-  });
 
-  socket.on("messageRequest", () => {
-    setRequestNotification(true);
-  });
   //#a60000
   const [currenctChat, setCurrentChat] = useState(null);
   const [receiver, setReceiver] = useState();
@@ -51,9 +45,23 @@ const Landing = () => {
   const sendMessageRequest = (content) => {
     console.log(content);
   };
+
   useEffect(() => {
-    if (window.sessionStorage.email === "") history.push("/");
+    if (window.sessionStorage.email === "") {
+      history.push("/");
+      return;
+    }
+
     login(window.sessionStorage.email, window.sessionStorage.password);
+
+    socket.on("disconnect", () => {
+      console.log("bye");
+      history.push("/");
+    });
+
+    socket.on("messageRequest", () => {
+      setRequestNotification(true);
+    });
   }, []);
 
   return (

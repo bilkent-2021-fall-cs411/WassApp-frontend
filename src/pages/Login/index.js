@@ -17,34 +17,34 @@ const Login = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogContent, setDialogContent] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  socket.on("connect", () => {
-    window.sessionStorage.setItem("email", email);
-    window.sessionStorage.setItem("password", password);
-    if (email && password) history.push("/landing");
-  });
-  socket.on("connect_error", (err) => {
-    if (err == "Error: xhr poll error") {
-      setDialogTitle("Error!");
-      setDialogContent("Wrong email or password");
-      setDialogOpen(true);
-      socket.disconnect();
-      // TODO: Login failed (probably). Show wrong email or password message
-    }
-  });
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      history.push("/landing");
+    });
+
+    socket.on("connect_error", (err) => {
+      if (err == "Error: xhr poll error") {
+        setDialogTitle("Error!");
+        setDialogContent("Wrong email or password");
+        setDialogOpen(true);
+        socket.disconnect();
+        window.sessionStorage.clear();
+      }
+    });
+  }, []);
 
   const submit = (e) => {
     e.preventDefault();
-    setEmail(e.target.email.value);
-    setPassword(e.target.password.value);
     login(e.target.email.value, e.target.password.value);
   };
+
   const handleClose = () => {
     setDialogTitle("");
     setDialogContent("");
     setDialogOpen(false);
   };
+
   return (
     <div className="root-container ">
       <div className="inner-content row">
