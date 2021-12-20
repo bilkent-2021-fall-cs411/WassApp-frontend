@@ -250,3 +250,12 @@ li {
   height: 100%;
   overflow: hidden;
 }
+.notification-count {
+  background: #52d46f;
+  color: white;
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0 6px;
+  height: 20px;
+  border-radius: 10px;
+}

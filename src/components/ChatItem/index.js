@@ -31,6 +31,10 @@ const ChatItem = (props) => {
             <IoCheckmark className="msg-status" />
           )}
           <p className="msg-last">{props.content}</p>
+          {props.notifications > 0 ? (
+            <div className="notification-count">{props.notifications}</div>
+          ) : null}
+
           <div>
             <IoChevronDownOutline
               className="chat-dropdown"
@@ -75,5 +79,6 @@ ChatItem.propTypes = {
   id: PropTypes.any,
   otherUser: PropTypes.any,
   onOption: PropTypes.func,
+  notifications: PropTypes.any,
 };
 export default ChatItem;
