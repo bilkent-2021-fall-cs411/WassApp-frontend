@@ -41,8 +41,6 @@ export function getChats(handleResponse) {
 export function getMessages(receiver, handleResponse) {
   const obj = {
     contact: receiver,
-    beforeDate: new Date(),
-    count: 100,
   };
   socket.emit("getMessages", obj, (response) => {
     handleResponse(response);

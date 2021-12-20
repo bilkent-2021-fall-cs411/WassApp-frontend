@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import moment from "moment";
 import {
   IoCheckmarkDoneOutline,
   IoCheckmark,
@@ -21,16 +22,18 @@ const ChatItem = (props) => {
     <div className="chat-item">
       <div className="chat-header">
         <h4 style={{ fontSize: "17px" }}>{props.otherUser.displayName}</h4>
-        <p className="msg-timestamp">{props.sendDate}</p>
+        <p className="msg-timestamp">
+          {moment(props.lastMessage.sendDate).format("h:mm")}
+        </p>
       </div>
       <div className="chat-header">
         <div className="msg-content">
-          {props.status === "DELIVERED" ? (
+          {props.lastMessage.status === "DELIVERED" ? (
             <IoCheckmarkDoneOutline className="msg-status" />
           ) : (
             <IoCheckmark className="msg-status" />
           )}
-          <p className="msg-last">{props.content}</p>
+          <p className="msg-last">{props.lastMessage.body}</p>
           {props.notifications > 0 ? (
             <div className="notification-count">{props.notifications}</div>
           ) : null}
@@ -73,10 +76,7 @@ const ChatItem = (props) => {
   );
 };
 ChatItem.propTypes = {
-  content: PropTypes.any,
-  status: PropTypes.any,
-  sendDate: PropTypes.any,
-  id: PropTypes.any,
+  lastMessage: PropTypes.any,
   otherUser: PropTypes.any,
   onOption: PropTypes.func,
   notifications: PropTypes.any,

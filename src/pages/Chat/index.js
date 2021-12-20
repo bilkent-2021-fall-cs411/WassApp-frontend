@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import sendIcon from "~/assets/send.svg";
 import PropTypes from "prop-types";
 import moment from "moment";
-import { sendMessage, deleteMessage, getMessages, socket } from "~/service";
+import { sendMessage, deleteMessage, socket } from "~/service";
 import { IoChevronDownOutline } from "react-icons/io5";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -34,14 +34,14 @@ const Chat = (props) => {
       setNewMsg("");
     }
   };
-  const handleMessageDelete = (id, contact) => {
-    console.log(id, contact);
+
+  const handleMessageDelete = (id) => {
     deleteMessage(id, (res) => {
       console.log(res);
       if (res.status === 200) {
-        getMessages(contact, (res) => {
-          setMessages(res.data.messages);
-        });
+        setMessages((oldMessages) =>
+          oldMessages.filter((message) => message.id !== id)
+        );
       }
     });
   };
@@ -59,7 +59,10 @@ const Chat = (props) => {
     socket.on("message", (data) => {
       handleNewMessage(data);
     });
-    console.log(messages);
+    const reversedMessages = props.content
+      ? props.content.slice().reverse()
+      : props.content;
+    setMessages(reversedMessages);
   }, [props.content]);
 
   useEffect(() => {
@@ -107,8 +110,8 @@ const Chat = (props) => {
                     <MenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleMessageDelete(m.id, m.sender);
-                        handleClose(e);
+                        handleMessageDelete(m.id);
+                        handleClose();
                       }}
                     >
                       Delete Chat

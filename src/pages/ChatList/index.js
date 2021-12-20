@@ -1,22 +1,25 @@
-import moment from "moment";
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ChatItem from "~/components/ChatItem";
-import { getChats, deleteChatHistory, getMessages } from "~/service";
+import { getChats, deleteChatHistory, getMessages, socket } from "~/service";
 
 const ChatList = (props) => {
   const [chats, setChats] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [notifications, setNotifications] = useState({});
+
   useEffect(() => {
-    const results = chats.filter(
-      (chat) =>
-        chat.otherUser.displayName.toLowerCase().includes(searchTerm) ||
-        chat.lastMessage.body.toLowerCase().includes(searchTerm)
-    );
+    const results = chats
+      .filter(
+        (chat) =>
+          chat.otherUser.displayName.toLowerCase().includes(searchTerm) ||
+          chat.lastMessage.body.toLowerCase().includes(searchTerm)
+      )
+      .sort((a, b) => b.lastMessage.sendDate - a.lastMessage.sendDate);
     setSearchResult(results);
-  }, [searchTerm]);
+  }, [searchTerm, chats]);
 
   const handleChatDelete = (contact) => {
     deleteChatHistory(contact, (res) => {
@@ -24,22 +27,58 @@ const ChatList = (props) => {
     });
   };
 
-  const getChatContent = (id) => {
-    getMessages(id.email, (content) => {
+  const getChatContent = (chat) => {
+    setSelectedChat(chat);
+    getMessages(chat.otherUser.email, (content) => {
       if (String(content.status).startsWith("2"))
-        props.onChatChange(content.data.messages, id);
+        props.onChatChange(content.data.messages, chat.otherUser);
     });
   };
+
   const getChatList = () => {
     getChats((data) => {
       if (String(data.status).startsWith("2")) {
         setChats(data.data);
-        setSearchResult(data.data);
+        setNotifications(
+          data.data.reduce((map, chat) => {
+            map[chat.otherUser.email] = chat.unreadMessages;
+            return map;
+          }, {})
+        );
       }
     });
   };
+
   useEffect(() => {
     getChatList();
+
+    socket.on("message", (message) => {
+      const messageChatPredicate = (chat) =>
+        chat.otherUser.email === message.sender ||
+        chat.otherUser.email === message.receiver;
+
+      if (selectedChat && messageChatPredicate(selectedChat)) {
+        return;
+      }
+
+      setChats((oldChats) => {
+        const oldChatIndex = oldChats.findIndex(messageChatPredicate);
+        if (oldChatIndex === -1) {
+          getChatList();
+          return [];
+        }
+        const oldChat = oldChats[oldChatIndex];
+        oldChat.lastMessage = message;
+
+        oldChats.splice(oldChatIndex, 1);
+        return [...oldChats, oldChat];
+      });
+
+      setNotifications((oldNotifications) => ({
+        ...oldNotifications,
+        [message.sender]: (oldNotifications[message.sender] || 0) + 1,
+      }));
+    });
   }, []);
 
   return (
@@ -54,16 +93,10 @@ const ChatList = (props) => {
       {searchResult.length > 0 ? (
         <div>
           {searchResult.map((chat) => (
-            <div
-              key={chat.lastMessage.id}
-              onClick={() => getChatContent(chat.otherUser)}
-            >
+            <div key={chat.lastMessage.id} onClick={() => getChatContent(chat)}>
               <ChatItem
-                id={chat.lastMessage.id}
                 otherUser={chat.otherUser}
-                sendDate={moment(chat.lastMessage.sendDate).format("h:mm")}
-                status={chat.lastMessage.status}
-                content={chat.lastMessage.body}
+                lastMessage={chat.lastMessage}
                 onOption={handleChatDelete}
                 notifications={notifications[chat.otherUser.email]}
               />

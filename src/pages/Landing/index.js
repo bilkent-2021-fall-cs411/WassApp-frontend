@@ -11,22 +11,17 @@ import ContactsIcon from "@mui/icons-material/Contacts";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { getMessages, login, logout, socket } from "~/service";
-import {
-  IoPersonAddOutline,
-  IoChatbubblesOutline,
-  IoPeopleCircleOutline,
-  IoSearchOutline,
-  IoLogOutOutline,
-} from "react-icons/io5";
+import { IoLogOutOutline } from "react-icons/io5";
 
 const Landing = () => {
   const history = useHistory();
 
-  const [currenctChat, setCurrentChat] = useState(null);
+  const [currentChat, setCurrentChat] = useState(null);
   const [receiver, setReceiver] = useState();
   const [chatNotification, setChatNotification] = useState(0);
   const [contactNotification, setContactNotification] = useState(0);
   const [requestNotification, setRequestNotification] = useState(9999);
+
   const handleChatSelect = (content, email) => {
     setReceiver(email);
     setCurrentChat(content);
@@ -35,6 +30,7 @@ const Landing = () => {
   const handleContactDelete = (content) => {
     console.log(content);
   };
+
   const handleContactMessage = (contact) => {
     setReceiver(contact);
     getChatContent(contact);
@@ -61,10 +57,6 @@ const Landing = () => {
     socket.on("disconnect", () => {
       console.log("bye");
       history.push("/");
-    });
-
-    socket.on("messageRequest", () => {
-      setRequestNotification(true);
     });
   }, []);
 
@@ -211,7 +203,7 @@ const Landing = () => {
             </div>
           </div>
           <div className="col" style={{ padding: 0, height: "100%" }}>
-            <Chat receiver={receiver} content={currenctChat} />
+            <Chat receiver={receiver} content={currentChat} />
           </div>
         </div>
       </div>
