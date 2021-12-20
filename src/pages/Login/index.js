@@ -68,7 +68,7 @@ const Login = (props) => {
         </Dialog>
         <div className="form-box">
           <Container maxWidth="xs" className="form-container">
-            <h3 className="form-title">Welcome to WassUp</h3>
+            <h3 className="form-title">Welcome to WassApp</h3>
             <form onSubmit={submit}>
               <TextField
                 type="email"

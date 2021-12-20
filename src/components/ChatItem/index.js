@@ -31,38 +31,38 @@ const ChatItem = (props) => {
             <IoCheckmark className="msg-status" />
           )}
           <p className="msg-last">{props.content}</p>
-        </div>
-        <div>
-          <IoChevronDownOutline
-            className="chat-dropdown"
-            id="basic-button"
-            aria-controls="basic-menu"
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick(e);
-            }}
-          />
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
-            }}
-          >
-            <MenuItem
+          <div>
+            <IoChevronDownOutline
+              className="chat-dropdown"
+              id="basic-button"
+              aria-controls="basic-menu"
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
               onClick={(e) => {
                 e.stopPropagation();
-                props.onOption(props.receiver);
-                handleClose(e);
+                handleClick(e);
+              }}
+            />
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
               }}
             >
-              Delete Chat
-            </MenuItem>
-          </Menu>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.onOption(props.receiver);
+                  handleClose(e);
+                }}
+              >
+                Delete Chat
+              </MenuItem>
+            </Menu>
+          </div>
         </div>
       </div>
     </div>

@@ -19,8 +19,18 @@ const Landing = () => {
     console.log("bye");
     history.push("/");
   });
-  const [currenctChat, setCurrentChat] = useState([]);
-  const handleChatSelect = (content) => {
+
+  socket.on("messageRequest", () => {
+    setRequestNotification(true);
+  });
+  //#a60000
+  const [currenctChat, setCurrentChat] = useState(null);
+  const [receiver, setReceiver] = useState();
+  const [chatNotification, setChatNotification] = useState(0);
+  const [contactNotification, setContactNotification] = useState(0);
+  const [requestNotification, setRequestNotification] = useState(0);
+  const handleChatSelect = (content, email) => {
+    setReceiver(email);
     setCurrentChat(content);
   };
 
@@ -28,12 +38,13 @@ const Landing = () => {
     console.log(content);
   };
   const handleContactMessage = (contact) => {
+    setReceiver(contact);
     getChatContent(contact);
   };
 
   const getChatContent = (contact) => {
     getMessages(contact, (content) => {
-      setCurrentChat(content);
+      setCurrentChat(content.data.messages);
     });
   };
 
@@ -52,7 +63,9 @@ const Landing = () => {
           <div className="col-4 chat-list">
             <div className="header">
               <div className="chat-header">
-                <p>{window.sessionStorage.email}</p>
+                <p style={{ wordBreak: "break-all" }}>
+                  {window.sessionStorage.email}
+                </p>
                 <IoLogOutOutline
                   onClick={() => logout()}
                   style={{ fontSize: "25px" }}
@@ -75,7 +88,11 @@ const Landing = () => {
                   aria-controls="chatlist"
                   aria-selected="true"
                 >
-                  <IoChatbubblesOutline />
+                  <IoChatbubblesOutline
+                    className={
+                      "nav-icon" + chatNotification ? " notified" : null
+                    }
+                  />
                 </a>
               </li>
               <li className="nav-item" role="presentation">
@@ -88,7 +105,11 @@ const Landing = () => {
                   aria-controls="contacts"
                   aria-selected="false"
                 >
-                  <IoPeopleCircleOutline />
+                  <IoPeopleCircleOutline
+                    className={
+                      "nav-icon" + contactNotification ? " notified" : null
+                    }
+                  />
                 </a>
               </li>
               <li className="nav-item" role="presentation">
@@ -101,7 +122,11 @@ const Landing = () => {
                   aria-controls="req"
                   aria-selected="false"
                 >
-                  <IoPersonAddOutline />
+                  <IoPersonAddOutline
+                    className={
+                      "nav-icon" + requestNotification ? " notified" : null
+                    }
+                  />
                 </a>
               </li>
               <li className="nav-item" role="presentation">
@@ -140,6 +165,7 @@ const Landing = () => {
                 style={{ height: "100%" }}
               >
                 <ContactList
+                  receiver={receiver}
                   onContactDelete={handleContactDelete}
                   onContactMessage={handleContactMessage}
                 />
@@ -164,8 +190,8 @@ const Landing = () => {
               </div>
             </div>
           </div>
-          <div className="col" style={{ padding: 0 }}>
-            <Chat content={currenctChat} />
+          <div className="col" style={{ padding: 0, height: "100%" }}>
+            <Chat receiver={receiver} content={currenctChat} />
           </div>
         </div>
       </div>

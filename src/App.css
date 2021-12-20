@@ -178,8 +178,10 @@
   cursor: pointer;
 }
 .msg-content {
+  width: 100%;
   margin: 0;
-  display: contents;
+  justify-content: space-between;
+  display: flex;
   font-size: 14px;
 }
 .msg-last {

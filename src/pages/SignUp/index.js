@@ -24,7 +24,7 @@ const SignUp = () => {
       <div className="inner-content row">
         <div className="form-box">
           <Container maxWidth="xs" className="form-container">
-            <h3 className="form-title">Start using WassUp</h3>
+            <h3 className="form-title">Start using WassApp</h3>
             <form onSubmit={submit}>
               <TextField
                 type="email"

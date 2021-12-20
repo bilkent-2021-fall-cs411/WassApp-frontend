@@ -52,6 +52,11 @@ export function getMessageRequests(handleResponse) {
     handleResponse(response);
   });
 }
+export function getContacts(handleResponse) {
+  socket.emit("getContacts", "", (response) => {
+    handleResponse(response);
+  });
+}
 
 export function sendMessage(message, handleMessage) {
   socket.emit("message", message, (response) => {
@@ -65,7 +70,8 @@ export function answerMessageRequest(answer, handleMessage) {
 }
 export function sendMessageRequest(contact, handleMessage) {
   socket.emit("sendMessageRequest", contact, (response) => {
-    handleMessage(response.data);
+    console.log(response);
+    handleMessage(response);
   });
 }
 export function deleteMessage(id, handleMessage) {
@@ -73,9 +79,19 @@ export function deleteMessage(id, handleMessage) {
     handleMessage(response);
   });
 }
-
+export function deleteContact(id, handleMessage) {
+  socket.emit("deleteContact", id, (response) => {
+    handleMessage(response);
+  });
+}
 export function deleteChatHistory(contact, handleMessage) {
   socket.emit("deleteChatHistory", contact, (response) => {
     handleMessage(response);
+  });
+}
+
+export function searchUsers(string, handleMessage) {
+  socket.emit("searchUsers", string, (res) => {
+    handleMessage(res);
   });
 }

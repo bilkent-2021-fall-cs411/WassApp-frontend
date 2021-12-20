@@ -1,31 +1,49 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ContactItem from "~/components/ContactItem";
-
+import { searchUsers } from "~/service";
 const ContactSearch = (props) => {
   const [contacts, setContacts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
-  useEffect(() => {
-    if (searchTerm === "") {
-      setSearchResult([]);
-    } else {
-      const results = contacts.filter(
-        (user) =>
-          user.displayName.toLowerCase().includes(searchTerm) ||
-          user.email.toLowerCase().includes(searchTerm)
-      );
-      setSearchResult(results);
-    }
-  }, [searchTerm]);
+  const [timeOut, setTimeOut] = useState();
+  const [canSend, setCanSend] = useState();
 
+  const onInput = (input) => {
+    setSearchTerm(input);
+    if (timeOut) {
+      clearTimeout(timeOut);
+      setCanSend(false);
+    }
+    setTimeOut(
+      setTimeout(() => {
+        setCanSend(true);
+      }, 1000)
+    );
+    console.log(input, timeOut);
+  };
+
+  const handleMessageRequest = (res) => {
+    if (String(res.status).startsWith("2")) {
+      getUserList();
+    }
+  };
+  const getUserList = () => {
+    searchUsers(searchTerm, (res) => {
+      if (String(res.status).startsWith("2")) {
+        setContacts(res.data);
+        setSearchResult(res.data);
+      }
+    });
+  };
   useEffect(() => {
-    const obj = {
-      displayName: "Jaaavid",
-      email: "javid@mail.com",
-    };
-    setContacts((pre) => [...pre, obj]);
-  }, []);
+    if (searchTerm === "" || searchTerm.length < 3) {
+      setSearchResult([]);
+    } else if (canSend) {
+      getUserList();
+    }
+  }, [canSend]);
+
   return (
     <div className="chat">
       <input
@@ -33,7 +51,7 @@ const ContactSearch = (props) => {
         type="text"
         placeholder="Search"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => onInput(e.target.value)}
       />
       {searchResult.length > 0 ? (
         <div>
@@ -43,7 +61,9 @@ const ContactSearch = (props) => {
               searchItem={true}
               displayName={item.displayName}
               email={item.email}
-              onMessage={props.onContactMessage}
+              onMessage={handleMessageRequest}
+              isInContacts={item.isInContacts}
+              isMsgReqSent={item.isMessageRequestSent}
             />
           ))}
         </div>

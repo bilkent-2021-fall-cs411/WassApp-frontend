@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   IoRemoveCircleOutline,
@@ -6,8 +6,25 @@ import {
   IoCloseCircleOutline,
   IoCheckmarkCircleOutline,
 } from "react-icons/io5";
+import { sendMessageRequest, login } from "~/service";
 
 const ContactItem = (props) => {
+  const [btnMsg, setBtnMsg] = useState("Send Request");
+  const [isDisabled, setIsDisabled] = useState(false);
+  useEffect(() => {
+    console.log(props);
+    if (props.isMsgReqSent) setBtnMsg("Request Sent");
+    login(window.sessionStorage.email, window.sessionStorage.password);
+  }, []);
+
+  const onRequest = (email) => {
+    sendMessageRequest(email, (res) => {
+      if (res) {
+        setBtnMsg("Request Sent");
+        setIsDisabled(true);
+      }
+    });
+  };
   return (
     <div className="chat-item row" style={{ margin: 0, alignItems: "center" }}>
       <div className="col">
@@ -17,7 +34,7 @@ const ContactItem = (props) => {
         <p className="msg-content">{props.email}</p>
       </div>
       <div className="col-3" style={{ padding: 0, textAlign: "center" }}>
-        {props.searchItem === undefined ? (
+        {props.searchItem === undefined || props.isInContacts ? (
           <IoSend
             className="contact-item-icon"
             onClick={(e) => {
@@ -25,6 +42,14 @@ const ContactItem = (props) => {
               props.onMessage(props.email);
             }}
           ></IoSend>
+        ) : props.searchItem === true ? (
+          <button
+            className="btn btn-sm btn-outline-dark "
+            onClick={() => onRequest(props.email)}
+            disabled={props.isMsgReqSent || isDisabled}
+          >
+            {btnMsg}
+          </button>
         ) : (
           <IoCheckmarkCircleOutline
             className="contact-item-icon"
@@ -62,6 +87,8 @@ ContactItem.propTypes = {
   isRequest: PropTypes.any,
   onAnswer: PropTypes.func,
   onMessage: PropTypes.func,
+  isInContacts: PropTypes.any,
+  isMsgReqSent: PropTypes.any,
   onDelete: PropTypes.func,
 };
 export default ContactItem;

@@ -18,18 +18,19 @@ const ChatList = (props) => {
 
   const handleChatDelete = (contact) => {
     deleteChatHistory(contact, (res) => {
-      if (res === "OK") getChatList();
+      if (String(res.status).startsWith("2")) getChatList();
     });
   };
 
   const getChatContent = (id) => {
     getMessages(id, (content) => {
-      props.onChatChange(content.data.messages);
+      if (String(content.status).startsWith("2"))
+        props.onChatChange(content.data.messages, id);
     });
   };
   const getChatList = () => {
     getChats((data) => {
-      if (data) {
+      if (String(data.status).startsWith("2")) {
         setChats(data.data);
         setSearchResult(data.data);
       }
@@ -54,7 +55,7 @@ const ChatList = (props) => {
           {searchResult.map((chat) => (
             <div
               key={chat.lastMessage.id}
-              onClick={() => getChatContent(chat.lastMessage.receiver)}
+              onClick={() => getChatContent(chat.otherUser.email)}
             >
               <ChatItem
                 id={chat.lastMessage.id}
