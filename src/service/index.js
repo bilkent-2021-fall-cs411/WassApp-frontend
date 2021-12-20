@@ -25,64 +25,57 @@ export function login(email, password) {
 
 export function logout() {
   socket.disconnect();
+  window.sessionStorage.email = "";
+  window.sessionStorage.password = "";
   // TODO: Erase local storage
 }
 
 // Functions for sending an event to the server
 export function getChats(handleResponse) {
   socket.emit("getChats", "", (response) => {
-    //checkChatResponse(response);
     handleResponse(response);
   });
 }
 
 export function getMessages(receiver, handleResponse) {
   const obj = {
-    chat: receiver,
+    contact: receiver,
     beforeDate: new Date(),
     count: 100,
   };
   socket.emit("getMessages", obj, (response) => {
-    //checkChatResponse(response);
+    handleResponse(response);
+  });
+}
+export function getMessageRequests(handleResponse) {
+  socket.emit("getMessageRequests", "", (response) => {
     handleResponse(response);
   });
 }
 
 export function sendMessage(message, handleMessage) {
   socket.emit("message", message, (response) => {
-    console.log(response);
-    // checkResponse(response);
     handleMessage(response.data);
   });
 }
-
-function checkResponse(response) {
-  if (response && response.status != 200) {
-    if (response.message) throw new Error(response.message);
-    else throw new Error("Unknown error");
-  }
+export function answerMessageRequest(answer, handleMessage) {
+  socket.emit("answerMessageRequest", answer, (response) => {
+    handleMessage(response);
+  });
+}
+export function sendMessageRequest(contact, handleMessage) {
+  socket.emit("sendMessageRequest", contact, (response) => {
+    handleMessage(response.data);
+  });
+}
+export function deleteMessage(id, handleMessage) {
+  socket.emit("deleteMessage", id, (response) => {
+    handleMessage(response);
+  });
 }
 
-// Connection-related events
-// socket.on("connect_error", (err) => {
-//   console.log("Socket IO connect error.", err);
-//   if (err == "Error: xhr poll error") {
-//     socket.disconnect();
-//     // TODO: Login failed (probably). Show wrong email or password message
-//   }
-// });
-
-// socket.on("connect", () => {
-//   console.log("Socket IO connect.", socket.id);
-// });
-
-// socket.on("reconnect", () => {
-//   console.log("Socket IO reconnect.", socket.id);
-// });
-
-// socket.on("disconnect", () => {
-//   console.log("Socket IO disconnect.");
-// });
-
-// Testing
-//login("ziya@mail.com", "salam123");
+export function deleteChatHistory(contact, handleMessage) {
+  socket.emit("deleteChatHistory", contact, (response) => {
+    handleMessage(response);
+  });
+}

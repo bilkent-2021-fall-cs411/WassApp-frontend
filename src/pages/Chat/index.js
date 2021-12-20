@@ -2,12 +2,30 @@ import React, { useState, useEffect, useRef } from "react";
 import sendIcon from "~/assets/send.svg";
 import PropTypes from "prop-types";
 import moment from "moment";
-import { sendMessage, socket, login } from "~/service";
+import {
+  sendMessage,
+  deleteMessage,
+  getMessages,
+  socket,
+  login,
+} from "~/service";
+import { IoChevronDownOutline } from "react-icons/io5";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 const Chat = (props) => {
   const messageEl = useRef(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(props.content);
   const [newMsg, setNewMsg] = useState("");
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const handleSubmit = (event) => {
     if ((event.key === "Enter" || event.type === "click") && newMsg !== "") {
       const msgObject = {
@@ -20,9 +38,20 @@ const Chat = (props) => {
       setNewMsg("");
     }
   };
+  const handleMessageDelete = (id, contact) => {
+    deleteMessage(id, (res) => {
+      console.log(res);
+      if (res.message === "OK") {
+        console.log(contact);
+        getMessages(contact, (res) => {
+          //console.log(res);
+          setMessages(res.data.messages);
+        });
+      }
+    });
+  };
 
   const handleNewMessage = (msg) => {
-    console.log("Message received:", msg);
     if (msg.sender == "javid@mail.com" || msg.receiver == "javid@mail.com")
       setMessages((prevMsg) => [...prevMsg, msg]);
     else {
@@ -31,6 +60,7 @@ const Chat = (props) => {
   };
 
   useEffect(() => {
+    console.log(props.content);
     login(window.sessionStorage.email, window.sessionStorage.password);
     setMessages(props.content);
     socket.on("message", (data) => {
@@ -57,6 +87,38 @@ const Chat = (props) => {
                 <p className="msg-timestamp">
                   {moment(new Date(m.sendDate)).format("h:mm")}
                 </p>
+                <div>
+                  <IoChevronDownOutline
+                    className="chat-dropdown"
+                    id="basic-button"
+                    aria-controls="basic-menu"
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClick(e);
+                    }}
+                  />
+                  <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    MenuListProps={{
+                      "aria-labelledby": "basic-button",
+                    }}
+                  >
+                    <MenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMessageDelete(m.id, m.receiver);
+                        handleClose(e);
+                      }}
+                    >
+                      Delete Chat
+                    </MenuItem>
+                  </Menu>
+                </div>
               </div>
             ))}
           </div>

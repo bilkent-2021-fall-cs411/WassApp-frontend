@@ -186,10 +186,12 @@
   text-overflow: ellipsis;
   overflow: hidden;
   margin: auto;
+  flex: auto;
   white-space: nowrap;
 }
 .msg-status {
-  font-size: 29px;
+  font-size: 18px;
+  margin: auto;
   margin-right: 2px;
 }
 .msg-timestamp {
@@ -226,7 +228,7 @@ li {
   color: #0738a1 !important;
 }
 .chat-dropdown {
-  font-size: 30px;
+  font-size: 22px;
   margin: 0px 0 0 11px;
 }
 .contact-item-icon {

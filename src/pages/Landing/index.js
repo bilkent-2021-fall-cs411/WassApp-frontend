@@ -4,21 +4,26 @@ import ChatList from "../ChatList";
 import ContactList from "../ContactList";
 import RequestList from "../RequestList";
 import ContactSearch from "../ContactSearch";
-import { getMessages, login } from "~/service";
+import { useHistory } from "react-router-dom";
+import { getMessages, login, logout, socket } from "~/service";
 import {
   IoPersonAddOutline,
   IoChatbubblesOutline,
   IoPeopleCircleOutline,
   IoSearchOutline,
+  IoLogOutOutline,
 } from "react-icons/io5";
 const Landing = () => {
+  const history = useHistory();
+  socket.on("disconnect", () => {
+    console.log("bye");
+    history.push("/");
+  });
   const [currenctChat, setCurrentChat] = useState([]);
   const handleChatSelect = (content) => {
-    setCurrentChat(content.messages);
+    setCurrentChat(content);
   };
-  const handleChatDelete = (content) => {
-    console.log(content);
-  };
+
   const handleContactDelete = (content) => {
     console.log(content);
   };
@@ -28,19 +33,15 @@ const Landing = () => {
 
   const getChatContent = (contact) => {
     getMessages(contact, (content) => {
-      setCurrentChat(content.messages);
+      setCurrentChat(content);
     });
   };
-  const handleReject = (content) => {
-    console.log(content);
-  };
-  const handleMessageRequest = (content) => {
-    console.log(content);
-  };
+
   const sendMessageRequest = (content) => {
     console.log(content);
   };
   useEffect(() => {
+    if (window.sessionStorage.email === "") history.push("/");
     login(window.sessionStorage.email, window.sessionStorage.password);
   }, []);
 
@@ -49,7 +50,15 @@ const Landing = () => {
       <div className="inner-content row">
         <div className="row chatList-main-container">
           <div className="col-4 chat-list">
-            <div className="header">{window.sessionStorage.email}</div>
+            <div className="header">
+              <div className="chat-header">
+                <p>{window.sessionStorage.email}</p>
+                <IoLogOutOutline
+                  onClick={() => logout()}
+                  style={{ fontSize: "25px" }}
+                />
+              </div>
+            </div>
             <ul
               className="nav nav-pills "
               id="listTab"
@@ -119,17 +128,16 @@ const Landing = () => {
                 id="chatlist"
                 role="tabpanel"
                 aria-labelledby="chatlist-tab"
+                style={{ height: "100%" }}
               >
-                <ChatList
-                  onChatDelete={(e) => handleChatDelete(e)}
-                  onChatChange={handleChatSelect}
-                />
+                <ChatList onChatChange={handleChatSelect} />
               </div>
               <div
                 className="tab-pane fade"
                 id="contacts"
                 role="tabpanel"
                 aria-labelledby="contacts-tab"
+                style={{ height: "100%" }}
               >
                 <ContactList
                   onContactDelete={handleContactDelete}
@@ -141,11 +149,9 @@ const Landing = () => {
                 id="req"
                 role="tabpanel"
                 aria-labelledby="req-tab"
+                style={{ height: "100%" }}
               >
-                <RequestList
-                  onMessageReject={handleReject}
-                  onContactMessage={handleMessageRequest}
-                />
+                <RequestList />
               </div>
               <div
                 className="tab-pane fade"

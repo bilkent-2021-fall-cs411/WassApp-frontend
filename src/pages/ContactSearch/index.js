@@ -3,16 +3,20 @@ import PropTypes from "prop-types";
 import ContactItem from "~/components/ContactItem";
 
 const ContactSearch = (props) => {
+  const [contacts, setContacts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   useEffect(() => {
-    const results = searchResult.filter(
-      (user) =>
-        user.displayName.toLowerCase().includes(searchTerm) ||
-        user.email.toLowerCase().includes(searchTerm)
-    );
-    setSearchResult(results);
-    console.log(results);
+    if (searchTerm === "") {
+      setSearchResult([]);
+    } else {
+      const results = contacts.filter(
+        (user) =>
+          user.displayName.toLowerCase().includes(searchTerm) ||
+          user.email.toLowerCase().includes(searchTerm)
+      );
+      setSearchResult(results);
+    }
   }, [searchTerm]);
 
   useEffect(() => {
@@ -20,7 +24,7 @@ const ContactSearch = (props) => {
       displayName: "Jaaavid",
       email: "javid@mail.com",
     };
-    setSearchResult((pre) => [...pre, obj]);
+    setContacts((pre) => [...pre, obj]);
   }, []);
   return (
     <div className="chat">

@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogContentText,
   DialogContent,
-  useScrollTrigger,
 } from "@material-ui/core";
 import { Link, useHistory } from "react-router-dom";
 import { login, socket } from "~/service";
@@ -23,10 +22,9 @@ const Login = (props) => {
   socket.on("connect", () => {
     window.sessionStorage.setItem("email", email);
     window.sessionStorage.setItem("password", password);
-    history.push("/landing");
+    if (email && password) history.push("/landing");
   });
   socket.on("connect_error", (err) => {
-    console.log("Socket IO connect error.", err);
     if (err == "Error: xhr poll error") {
       setDialogTitle("Error!");
       setDialogContent("Wrong email or password");
@@ -40,7 +38,7 @@ const Login = (props) => {
     e.preventDefault();
     setEmail(e.target.email.value);
     setPassword(e.target.password.value);
-    login(email, password);
+    login(e.target.email.value, e.target.password.value);
   };
   const handleClose = () => {
     setDialogTitle("");

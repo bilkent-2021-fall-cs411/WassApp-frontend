@@ -20,12 +20,12 @@ const ChatItem = (props) => {
   return (
     <div className="chat-item">
       <div className="chat-header">
-        <h4 style={{ fontSize: "17px" }}>{props.receiver}</h4>
+        <h4 style={{ fontSize: "17px" }}>{props.to}</h4>
         <p className="msg-timestamp">{props.sendDate}</p>
       </div>
       <div className="chat-header">
         <div className="msg-content">
-          {props.status === "SENT" ? (
+          {props.status === "DELIVERED" ? (
             <IoCheckmarkDoneOutline className="msg-status" />
           ) : (
             <IoCheckmark className="msg-status" />
@@ -75,6 +75,7 @@ ChatItem.propTypes = {
   status: PropTypes.any,
   sendDate: PropTypes.any,
   id: PropTypes.any,
+  to: PropTypes.any,
   onOption: PropTypes.func,
 };
 export default ChatItem;

@@ -17,7 +17,6 @@ const SignUp = () => {
     });
   };
   const handleRegister = (res) => {
-    console.log(res);
     history.push("/chat-list");
   };
   return (
