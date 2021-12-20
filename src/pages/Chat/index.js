@@ -25,7 +25,7 @@ const Chat = (props) => {
   const handleSubmit = (event) => {
     if ((event.key === "Enter" || event.type === "click") && newMsg !== "") {
       const msgObject = {
-        receiver: props.receiver,
+        receiver: props.receiver.email,
         body: newMsg,
       };
       sendMessage(msgObject, (msg) => {
@@ -35,7 +35,9 @@ const Chat = (props) => {
     }
   };
   const handleMessageDelete = (id, contact) => {
+    console.log(id, contact);
     deleteMessage(id, (res) => {
+      console.log(res);
       if (res.status === 200) {
         getMessages(contact, (res) => {
           setMessages(res.data.messages);
@@ -45,16 +47,19 @@ const Chat = (props) => {
   };
 
   const handleNewMessage = (msg) => {
-    if (msg.sender == props.receiver || msg.receiver == props.receiver)
+    if (
+      msg.sender == props.receiver.email ||
+      msg.receiver == props.receiver.email
+    )
       setMessages((prevMsg) => [...prevMsg, msg]);
   };
 
   useEffect(() => {
     setMessages(props.content);
     socket.on("message", (data) => {
-      console.log(data);
       handleNewMessage(data);
     });
+    console.log(messages);
   }, [props.content]);
 
   useEffect(() => {
@@ -65,6 +70,13 @@ const Chat = (props) => {
     <div className=" chat">
       {messages !== null ? (
         <div className="chat-container">
+          <div className="header" style={{ padding: "1% 4%" }}>
+            <div className="chat-header">
+              <p style={{ wordBreak: "break-all", fontWeight: 0 }}>
+                {props.receiver.displayName}
+              </p>
+            </div>
+          </div>
           <div className="messages">
             {messages.map((m, i) => (
               <div
@@ -74,8 +86,6 @@ const Chat = (props) => {
                 }`}
               >
                 <div className="msg-content">
-                  {m.sender}
-                  {window.sessionStorage.email}
                   <p>{m.body}</p>
                   <IoChevronDownOutline
                     className="chat-dropdown"
@@ -93,14 +103,11 @@ const Chat = (props) => {
                     anchorEl={anchorEl}
                     open={open}
                     onClose={handleClose}
-                    MenuListProps={{
-                      "aria-labelledby": "basic-button",
-                    }}
                   >
                     <MenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleMessageDelete(m.id, m.receiver);
+                        handleMessageDelete(m.id, m.sender);
                         handleClose(e);
                       }}
                     >

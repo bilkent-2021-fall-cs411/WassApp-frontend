@@ -25,7 +25,7 @@ const ChatList = (props) => {
   };
 
   const getChatContent = (id) => {
-    getMessages(id, (content) => {
+    getMessages(id.email, (content) => {
       if (String(content.status).startsWith("2"))
         props.onChatChange(content.data.messages, id);
     });
@@ -56,7 +56,7 @@ const ChatList = (props) => {
           {searchResult.map((chat) => (
             <div
               key={chat.lastMessage.id}
-              onClick={() => getChatContent(chat.otherUser.email)}
+              onClick={() => getChatContent(chat.otherUser)}
             >
               <ChatItem
                 id={chat.lastMessage.id}
