@@ -10,6 +10,7 @@ import MenuItem from "@mui/material/MenuItem";
 const Chat = (props) => {
   const messagesEndRef = useRef(null);
 
+  const [selectedMsg, setSelectedMsg] = useState(null);
   const [messages, setMessages] = useState(null);
   const [newMsg, setNewMsg] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
@@ -37,7 +38,6 @@ const Chat = (props) => {
 
   const handleMessageDelete = (id) => {
     deleteMessage(id, (res) => {
-      console.log(res);
       if (res.status === 200) {
         setMessages((oldMessages) =>
           oldMessages.filter((message) => message.id !== id)
@@ -73,7 +73,7 @@ const Chat = (props) => {
     <div className=" chat">
       {messages !== null ? (
         <div className="chat-container">
-          <div className="header" style={{ padding: "1% 4%" }}>
+          <div className="header" style={{ padding: "2% 4%" }}>
             <div className="chat-header">
               <p style={{ wordBreak: "break-all", fontWeight: 0 }}>
                 {props.receiver.displayName}
@@ -98,25 +98,10 @@ const Chat = (props) => {
                     aria-expanded={open ? "true" : undefined}
                     onClick={(e) => {
                       e.stopPropagation();
+                      setSelectedMsg(m);
                       handleClick(e);
                     }}
                   />
-                  <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                  >
-                    <MenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMessageDelete(m.id);
-                        handleClose();
-                      }}
-                    >
-                      Delete Chat
-                    </MenuItem>
-                  </Menu>
                 </div>
 
                 <p className="msg-timestamp">
@@ -124,6 +109,22 @@ const Chat = (props) => {
                 </p>
               </div>
             ))}
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+            >
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMessageDelete(selectedMsg.id);
+                  handleClose(e);
+                }}
+              >
+                Delete Chat
+              </MenuItem>
+            </Menu>
             <div
               ref={messagesEndRef}
               className="msg"

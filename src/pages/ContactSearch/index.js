@@ -37,7 +37,7 @@ const ContactSearch = (props) => {
     });
   };
   useEffect(() => {
-    if (searchTerm === "" || searchTerm.length < 3) {
+    if (searchTerm === "") {
       setSearchResult([]);
     } else if (canSend) {
       getUserList();
@@ -69,8 +69,11 @@ const ContactSearch = (props) => {
         </div>
       ) : (
         <div className="chat-warning">
+          {canSend}
           {searchTerm === ""
             ? "Search user by their display name or email."
+            : !canSend
+            ? "Searching"
             : "User not found :("}
         </div>
       )}

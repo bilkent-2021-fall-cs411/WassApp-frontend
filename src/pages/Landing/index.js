@@ -10,13 +10,15 @@ import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import { getMessages, login, logout, socket } from "~/service";
+import { getMessages, login, logout, socket, getUserDetails } from "~/service";
 import { IoLogOutOutline } from "react-icons/io5";
+import logo from "~/assets/logo.png";
 
 const Landing = () => {
   const history = useHistory();
 
   const [currentChat, setCurrentChat] = useState(null);
+  const [currentUser, setCurrentUser] = useState("");
   const [receiver, setReceiver] = useState();
   const [chatNotification, setChatNotification] = useState(0);
   const [contactNotification, setContactNotification] = useState(0);
@@ -54,6 +56,12 @@ const Landing = () => {
 
     login(window.sessionStorage.email, window.sessionStorage.password);
 
+    getUserDetails((data) => {
+      console.log(data);
+      if (String(data.status).startsWith("2")) {
+        setCurrentUser(data.data);
+      }
+    });
     socket.on("disconnect", () => {
       console.log("bye");
       history.push("/");
@@ -67,8 +75,9 @@ const Landing = () => {
           <div className="col-4 chat-list">
             <div className="header">
               <div className="chat-header">
+                <img style={{ height: "25px" }} src={logo} />
                 <p style={{ wordBreak: "break-all" }}>
-                  {window.sessionStorage.email}
+                  {currentUser.displayName}
                 </p>
                 <IoLogOutOutline
                   onClick={() => logout()}

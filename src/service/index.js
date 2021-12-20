@@ -37,6 +37,11 @@ export function getChats(handleResponse) {
     handleResponse(response);
   });
 }
+export function getUserDetails(handleResponse) {
+  socket.emit("whoAmI", "", (response) => {
+    handleResponse(response);
+  });
+}
 
 export function getMessages(receiver, handleResponse) {
   const obj = {
