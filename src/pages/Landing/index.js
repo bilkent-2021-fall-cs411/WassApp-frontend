@@ -10,7 +10,14 @@ import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import { getMessages, login, logout, socket, getUserDetails } from "~/service";
+import {
+  getMessages,
+  login,
+  logout,
+  socket,
+  getUserDetails,
+  getMessageRequests,
+} from "~/service";
 import { IoLogOutOutline } from "react-icons/io5";
 import logo from "~/assets/logo.png";
 
@@ -20,9 +27,10 @@ const Landing = () => {
   const [currentChat, setCurrentChat] = useState(null);
   const [currentUser, setCurrentUser] = useState("");
   const [receiver, setReceiver] = useState();
+  const [activeTab, setActiveTab] = useState("chats");
   const [chatNotification, setChatNotification] = useState(0);
   const [contactNotification, setContactNotification] = useState(0);
-  const [requestNotification, setRequestNotification] = useState(9999);
+  const [requestNotification, setRequestNotification] = useState(0);
 
   const handleChatSelect = (content, email) => {
     setReceiver(email);
@@ -38,6 +46,10 @@ const Landing = () => {
     getChatContent(contact.email);
   };
 
+  const decreaseRequestNotification = () => {
+    setRequestNotification((oldNotification) => oldNotification - 1);
+  };
+
   const getChatContent = (contact) => {
     getMessages(contact, (content) => {
       setCurrentChat(content.data.messages);
@@ -47,6 +59,12 @@ const Landing = () => {
   const sendMessageRequest = (content) => {
     console.log(content);
   };
+
+  useEffect(() => {
+    if (activeTab === "contacts") {
+      setContactNotification(0);
+    }
+  }, [activeTab, contactNotification]);
 
   useEffect(() => {
     if (window.sessionStorage.email === "") {
@@ -64,6 +82,21 @@ const Landing = () => {
     socket.on("disconnect", () => {
       console.log("bye");
       history.push("/");
+    });
+
+    getMessageRequests((data) => {
+      setRequestNotification((oldCount) => oldCount + data.data.length);
+    });
+
+    socket.on("messageRequest", () => {
+      setRequestNotification((oldCount) => oldCount + 1);
+    });
+
+    socket.on("messageRequestAnswer", (data) => {
+      if (data.answer === "ACCEPT") {
+        console.log("contact +1");
+        setContactNotification((oldCount) => oldCount + 1);
+      }
     });
   }, []);
 
@@ -90,7 +123,11 @@ const Landing = () => {
               role="tablist"
               style={{ marginBottom: " 0 !important" }}
             >
-              <li className="nav-item" role="presentation">
+              <li
+                className="nav-item"
+                role="presentation"
+                onClick={() => setActiveTab("chats")}
+              >
                 <a
                   className="nav-link active"
                   id="chatlist-tab"
@@ -109,7 +146,11 @@ const Landing = () => {
                   )}
                 </a>
               </li>
-              <li className="nav-item" role="presentation">
+              <li
+                className="nav-item"
+                role="presentation"
+                onClick={() => setActiveTab("contacts")}
+              >
                 <a
                   className="nav-link"
                   id="contacts-tab"
@@ -128,7 +169,11 @@ const Landing = () => {
                   )}
                 </a>
               </li>
-              <li className="nav-item" role="presentation">
+              <li
+                className="nav-item"
+                role="presentation"
+                onClick={() => setActiveTab("requests")}
+              >
                 <a
                   className="nav-link"
                   id="req-tab"
@@ -149,7 +194,11 @@ const Landing = () => {
                   </div>
                 </a>
               </li>
-              <li className="nav-item" role="presentation">
+              <li
+                className="nav-item"
+                role="presentation"
+                onClick={() => setActiveTab("search")}
+              >
                 <a
                   className="nav-link"
                   id="search-tab"
@@ -186,6 +235,7 @@ const Landing = () => {
               >
                 <ContactList
                   receiver={receiver}
+                  contactNotification={contactNotification}
                   onContactDelete={handleContactDelete}
                   onContactMessage={handleContactMessage}
                 />
@@ -197,7 +247,9 @@ const Landing = () => {
                 aria-labelledby="req-tab"
                 style={{ height: "100%" }}
               >
-                <RequestList />
+                <RequestList
+                  decreaseRequestNotification={decreaseRequestNotification}
+                />
               </div>
               <div
                 className="tab-pane fade"

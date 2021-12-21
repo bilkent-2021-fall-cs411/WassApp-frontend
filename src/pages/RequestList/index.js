@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { answerMessageRequest, getMessageRequests } from "~/service";
+import { answerMessageRequest, getMessageRequests, socket } from "~/service";
 
 import ContactItem from "~/components/ContactItem";
 const RequestList = (props) => {
@@ -14,26 +14,32 @@ const RequestList = (props) => {
         user.email.toLowerCase().includes(searchTerm)
     );
     setSearchResult(results);
-  }, [searchTerm]);
+  }, [searchTerm, requests]);
   const handleAnswer = (contact, answer) => {
     const obj = {
       contact: contact,
       answer: answer,
     };
     answerMessageRequest(obj, (res) => {
-      if (res) getRequestList();
+      if (res) {
+        getRequestList();
+        props.decreaseRequestNotification();
+      }
     });
   };
 
   const getRequestList = () => {
     getMessageRequests((res) => {
       setRequests(res.data);
-      setSearchResult(res.data);
     });
   };
 
   useEffect(() => {
     getRequestList();
+
+    socket.on("messageRequest", (data) => {
+      setRequests((oldRequests) => [...oldRequests, data]);
+    });
   }, []);
 
   return (
@@ -69,5 +75,8 @@ const RequestList = (props) => {
     </div>
   );
 };
-RequestList.propTypes = {};
+
+RequestList.propTypes = {
+  decreaseRequestNotification: PropTypes.func.isRequired,
+};
 export default RequestList;

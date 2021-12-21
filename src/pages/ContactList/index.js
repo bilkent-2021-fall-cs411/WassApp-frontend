@@ -7,6 +7,7 @@ const ContactList = (props) => {
   const [contacts, setContacts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+
   useEffect(() => {
     const results = contacts.filter(
       (user) =>
@@ -14,13 +15,12 @@ const ContactList = (props) => {
         user.email.toLowerCase().includes(searchTerm)
     );
     setSearchResult(results);
-  }, [searchTerm]);
+  }, [searchTerm, contacts]);
 
   const getContactList = () => {
     getContacts((res) => {
       if (String(res.status).startsWith("2")) {
         setContacts(res.data);
-        setSearchResult(res.data);
       }
     });
   };
@@ -30,6 +30,10 @@ const ContactList = (props) => {
       if (String(res.status).startsWith("2")) getContactList();
     });
   };
+
+  useEffect(() => {
+    getContactList();
+  }, [props.contactNotification]);
 
   useEffect(() => {
     getContactList();
@@ -70,5 +74,6 @@ const ContactList = (props) => {
 ContactList.propTypes = {
   onContactMessage: PropTypes.any,
   onContactDelete: PropTypes.func,
+  contactNotification: PropTypes.number,
 };
 export default ContactList;
