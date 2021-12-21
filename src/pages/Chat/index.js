@@ -7,6 +7,7 @@ import {
   deleteMessage,
   replaceListener,
   readMessage,
+  socket,
 } from "~/service";
 import { IoChevronDownOutline } from "react-icons/io5";
 import Menu from "@mui/material/Menu";
@@ -67,6 +68,16 @@ const Chat = (props) => {
   );
 
   useEffect(() => {
+    replaceListener("deleteChatHistory", "chatDeleteChatHistory", (data) => {
+      if (props.receiver.email === data.contact) {
+        setSelectedMsg(null);
+        setMessages(null);
+        setNewMsg("");
+      }
+    });
+  }, [props.receiver]);
+
+  useEffect(() => {
     const reversedMessages = props.content
       ? props.content.slice().reverse()
       : props.content;
@@ -85,9 +96,17 @@ const Chat = (props) => {
     replaceListener("message", "chatMessageListener", chatMessageListener);
   }, [handleNewMessage]);
 
+  useEffect(() => {
+    socket.on("deleteMessage", (msg) => {
+      setMessages((oldMessages) =>
+        oldMessages.filter((message) => message.id !== msg.id)
+      );
+    });
+  }, []);
+
   return (
     <div className=" chat">
-      {messages !== null ? (
+      {messages !== null && props.receiver ? (
         <div className="chat-container">
           <div className="header" style={{ padding: "2% 4%" }}>
             <div className="chat-header">

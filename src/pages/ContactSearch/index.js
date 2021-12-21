@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import ContactItem from "~/components/ContactItem";
 import { searchUsers } from "~/service";
 const ContactSearch = (props) => {
-  const [contacts, setContacts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [timeOut, setTimeOut] = useState();
@@ -30,18 +29,19 @@ const ContactSearch = (props) => {
   const getUserList = () => {
     searchUsers(searchTerm, (res) => {
       if (String(res.status).startsWith("2")) {
-        setContacts(res.data);
         setSearchResult(res.data);
       }
     });
   };
   useEffect(() => {
+    if (props.activeTab !== "search") return;
+
     if (searchTerm === "") {
       setSearchResult([]);
     } else if (canSend) {
       getUserList();
     }
-  }, [canSend]);
+  }, [canSend, props.activeTab]);
 
   return (
     <div className="chat">
@@ -79,6 +79,6 @@ const ContactSearch = (props) => {
   );
 };
 ContactSearch.propTypes = {
-  onContactMessage: PropTypes.func,
+  activeTab: PropTypes.string,
 };
 export default ContactSearch;

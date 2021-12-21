@@ -35,12 +35,14 @@ const RequestList = (props) => {
   };
 
   useEffect(() => {
-    getRequestList();
-
     socket.on("messageRequest", (data) => {
       setRequests((oldRequests) => [...oldRequests, data]);
     });
   }, []);
+
+  useEffect(() => {
+    if (props.activeTab === "requests") getRequestList();
+  }, [props.activeTab]);
 
   return (
     <div className="chat">
@@ -78,5 +80,6 @@ const RequestList = (props) => {
 
 RequestList.propTypes = {
   decreaseRequestNotification: PropTypes.func.isRequired,
+  activeTab: PropTypes.string,
 };
 export default RequestList;

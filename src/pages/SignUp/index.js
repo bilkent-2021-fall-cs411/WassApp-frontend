@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, TextField, Button } from "@material-ui/core";
 import { Link, withRouter, useHistory } from "react-router-dom";
-import { register, socket } from "~/service";
+import { register } from "~/service";
 
 const SignUp = () => {
   const history = useHistory();
@@ -16,7 +16,7 @@ const SignUp = () => {
       handleRegister(res);
     });
   };
-  const handleRegister = (res) => {
+  const handleRegister = () => {
     history.push("/chat-list");
   };
   return (

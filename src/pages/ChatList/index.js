@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import ChatItem from "~/components/ChatItem";
 import {
@@ -26,7 +26,6 @@ const ChatList = (props) => {
         (a, b) =>
           new Date(b.lastMessage.sendDate) - new Date(a.lastMessage.sendDate)
       );
-    console.log("Results:", results);
     setSearchResult(results);
   }, [searchTerm, chats]);
 
@@ -38,21 +37,29 @@ const ChatList = (props) => {
     });
   };
 
-  const getChatContent = (chat) => {
-    setNotifications((oldNotifications) => {
-      return {
-        ...oldNotifications,
-        [chat.otherUser.email]: 0,
-      };
-    });
-    setSelectedChat(chat);
-    getMessages(chat.otherUser.email, (content) => {
-      if (String(content.status).startsWith("2"))
-        props.onChatChange(content.data.messages, chat.otherUser);
-    });
-  };
+  const getChatContent = useCallback(
+    (chat) => {
+      setSelectedChat(chat);
+      if (!chat) {
+        props.onChatChange(null, null);
+        return;
+      }
 
-  const getChatList = () => {
+      setNotifications((oldNotifications) => {
+        return {
+          ...oldNotifications,
+          [chat.otherUser.email]: 0,
+        };
+      });
+      getMessages(chat.otherUser.email, (content) => {
+        if (String(content.status).startsWith("2"))
+          props.onChatChange(content.data.messages, chat.otherUser);
+      });
+    },
+    [props]
+  );
+
+  const getChatList = useCallback(() => {
     getChats((data) => {
       if (String(data.status).startsWith("2")) {
         setChats(data.data);
@@ -62,9 +69,17 @@ const ChatList = (props) => {
             return map;
           }, {})
         );
+        if (
+          selectedChat &&
+          !data.data.some(
+            (chat) => chat.otherUser.email === selectedChat.otherUser.email
+          )
+        ) {
+          getChatContent(null);
+        }
       }
     });
-  };
+  }, [selectedChat, getChatContent]);
 
   useEffect(() => {
     const chatListMessageListener = (message) => {
@@ -107,11 +122,25 @@ const ChatList = (props) => {
       "chatListMessageListener",
       chatListMessageListener
     );
-  }, [selectedChat]);
+  }, [selectedChat, getChatList]);
 
   useEffect(() => {
-    getChatList();
-  }, []);
+    replaceListener("deleteChatHistory", "deleteChatHistoryListener", () => {
+      getChatList();
+    });
+  }, [getChatList]);
+
+  useEffect(() => {
+    if (props.activeTab === "chats") getChatList();
+  }, [props.activeTab, getChatList]);
+
+  useEffect(() => {
+    const numOfNotifications = Object.values(notifications).reduce(
+      (a, b) => a + b,
+      0
+    );
+    props.setChatNotification(numOfNotifications);
+  }, [notifications, props]);
 
   return (
     <div className="chat">
@@ -151,5 +180,7 @@ const ChatList = (props) => {
 ChatList.propTypes = {
   onChatChange: PropTypes.any,
   onChatDelete: PropTypes.func,
+  activeTab: PropTypes.string,
+  setChatNotification: PropTypes.func,
 };
 export default ChatList;

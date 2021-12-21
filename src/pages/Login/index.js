@@ -12,7 +12,7 @@ import {
 import { Link, useHistory } from "react-router-dom";
 import { login, socket } from "~/service";
 
-const Login = (props) => {
+const Login = () => {
   const history = useHistory();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");

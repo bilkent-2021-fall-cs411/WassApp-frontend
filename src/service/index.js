@@ -118,5 +118,4 @@ export function replaceListener(eventName, functionName, listener) {
     socket.removeListener(eventName, oldListener);
   }
   socket.on(eventName, listener);
-  console.log(eventName, "listeners:", socket.listeners(eventName));
 }

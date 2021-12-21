@@ -37,10 +37,6 @@ const Landing = () => {
     setCurrentChat(content);
   };
 
-  const handleContactDelete = (content) => {
-    console.log(content);
-  };
-
   const handleContactMessage = (contact) => {
     setReceiver(contact);
     getChatContent(contact.email);
@@ -54,10 +50,6 @@ const Landing = () => {
     getMessages(contact, (content) => {
       setCurrentChat(content.data.messages);
     });
-  };
-
-  const sendMessageRequest = (content) => {
-    console.log(content);
   };
 
   useEffect(() => {
@@ -94,7 +86,6 @@ const Landing = () => {
 
     socket.on("messageRequestAnswer", (data) => {
       if (data.answer === "ACCEPT") {
-        console.log("contact +1");
         setContactNotification((oldCount) => oldCount + 1);
       }
     });
@@ -224,7 +215,11 @@ const Landing = () => {
                 aria-labelledby="chatlist-tab"
                 style={{ height: "100%" }}
               >
-                <ChatList onChatChange={handleChatSelect} />
+                <ChatList
+                  onChatChange={handleChatSelect}
+                  activeTab={activeTab}
+                  setChatNotification={setChatNotification}
+                />
               </div>
               <div
                 className="tab-pane fade"
@@ -234,10 +229,9 @@ const Landing = () => {
                 style={{ height: "100%" }}
               >
                 <ContactList
-                  receiver={receiver}
                   contactNotification={contactNotification}
-                  onContactDelete={handleContactDelete}
                   onContactMessage={handleContactMessage}
+                  activeTab={activeTab}
                 />
               </div>
               <div
@@ -249,6 +243,7 @@ const Landing = () => {
               >
                 <RequestList
                   decreaseRequestNotification={decreaseRequestNotification}
+                  activeTab={activeTab}
                 />
               </div>
               <div
@@ -258,7 +253,7 @@ const Landing = () => {
                 aria-labelledby="search-tab"
                 style={{ height: "100%" }}
               >
-                <ContactSearch onContactMessage={sendMessageRequest} />
+                <ContactSearch activeTab={activeTab} />
               </div>
             </div>
           </div>

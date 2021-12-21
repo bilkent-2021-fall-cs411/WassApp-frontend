@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { deleteContact, getContacts } from "~/service";
+import { deleteContact, getContacts, socket } from "~/service";
 
 import ContactItem from "~/components/ContactItem";
 const ContactList = (props) => {
@@ -32,11 +32,13 @@ const ContactList = (props) => {
   };
 
   useEffect(() => {
-    getContactList();
-  }, [props.contactNotification]);
+    if (props.activeTab === "contacts") getContactList();
+  }, [props.contactNotification, props.activeTab]);
 
   useEffect(() => {
-    getContactList();
+    socket.on("deleteContact", () => {
+      getContactList();
+    });
   }, []);
 
   return (
@@ -65,7 +67,7 @@ const ContactList = (props) => {
             ? "You do not have any contacts"
             : searchTerm === ""
             ? "Loading"
-            : "Contact not found :("}
+            : "Contact not found"}
         </div>
       )}
     </div>
@@ -73,7 +75,7 @@ const ContactList = (props) => {
 };
 ContactList.propTypes = {
   onContactMessage: PropTypes.any,
-  onContactDelete: PropTypes.func,
   contactNotification: PropTypes.number,
+  activeTab: PropTypes.string,
 };
 export default ContactList;
