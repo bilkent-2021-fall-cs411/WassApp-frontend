@@ -12,7 +12,6 @@ const ContactItem = (props) => {
   const [btnMsg, setBtnMsg] = useState("Send Request");
   const [isDisabled, setIsDisabled] = useState(false);
   useEffect(() => {
-    console.log(props);
     if (props.isMsgReqSent) setBtnMsg("Request Sent");
   }, []);
 
@@ -28,9 +27,9 @@ const ContactItem = (props) => {
     <div className="chat-item row" style={{ margin: 0, alignItems: "center" }}>
       <div className="col">
         <div className="chat-header">
-          <h4 style={{ fontSize: "17px" }}>{props.displayName}</h4>
+          <h4 style={{ fontSize: "17px" }}>{props.contact.displayName}</h4>
         </div>
-        <p className="msg-content">{props.email}</p>
+        <p className="msg-content">{props.contact.email}</p>
       </div>
       <div className="col-3" style={{ padding: 0, textAlign: "center" }}>
         {props.searchItem === undefined || props.isInContacts ? (
@@ -38,13 +37,13 @@ const ContactItem = (props) => {
             className="contact-item-icon"
             onClick={(e) => {
               e.stopPropagation();
-              props.onMessage(props.email);
+              props.onMessage(props.contact);
             }}
           ></IoSend>
         ) : props.searchItem === true ? (
           <button
             className="btn btn-sm btn-outline-dark "
-            onClick={() => onRequest(props.email)}
+            onClick={() => onRequest(props.contact.email)}
             disabled={props.isMsgReqSent || isDisabled}
           >
             {btnMsg}
@@ -54,7 +53,7 @@ const ContactItem = (props) => {
             className="contact-item-icon"
             onClick={(e) => {
               e.stopPropagation();
-              props.onAnswer(props.email, "ACCEPT");
+              props.onAnswer(props.contact.email, "ACCEPT");
             }}
           />
         )}
@@ -63,7 +62,7 @@ const ContactItem = (props) => {
             className="contact-item-icon"
             onClick={(e) => {
               e.stopPropagation();
-              props.onDelete(props.email);
+              props.onDelete(props.contact.email);
             }}
           />
         ) : props.isRequest ? (
@@ -71,7 +70,7 @@ const ContactItem = (props) => {
             className="contact-item-icon"
             onClick={(e) => {
               e.stopPropagation();
-              props.onAnswer(props.email, "REJECT");
+              props.onAnswer(props.contact.email, "REJECT");
             }}
           />
         ) : null}
@@ -80,8 +79,7 @@ const ContactItem = (props) => {
   );
 };
 ContactItem.propTypes = {
-  displayName: PropTypes.any,
-  email: PropTypes.any,
+  contact: PropTypes.any,
   searchItem: PropTypes.any,
   isRequest: PropTypes.any,
   onAnswer: PropTypes.func,

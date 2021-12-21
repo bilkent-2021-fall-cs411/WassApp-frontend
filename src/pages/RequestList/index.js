@@ -50,8 +50,7 @@ const RequestList = (props) => {
           {searchResult.map((contact, index) => (
             <ContactItem
               key={index}
-              displayName={contact.displayName}
-              email={contact.email}
+              contact={contact}
               onAnswer={handleAnswer}
               isRequest={true}
               searchItem={false}

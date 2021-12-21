@@ -18,7 +18,6 @@ const ContactList = (props) => {
 
   const getContactList = () => {
     getContacts((res) => {
-      console.log(res);
       if (String(res.status).startsWith("2")) {
         setContacts(res.data);
         setSearchResult(res.data);
@@ -50,8 +49,7 @@ const ContactList = (props) => {
           {searchResult.map((contact, index) => (
             <ContactItem
               key={index}
-              displayName={contact.displayName}
-              email={contact.email}
+              contact={contact}
               onDelete={handleDelete}
               onMessage={props.onContactMessage}
             />

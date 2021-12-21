@@ -20,7 +20,6 @@ const ContactSearch = (props) => {
         setCanSend(true);
       }, 1000)
     );
-    console.log(input, timeOut);
   };
 
   const handleMessageRequest = (res) => {
@@ -59,8 +58,7 @@ const ContactSearch = (props) => {
             <ContactItem
               key={index}
               searchItem={true}
-              displayName={item.displayName}
-              email={item.email}
+              contact={item}
               onMessage={handleMessageRequest}
               isInContacts={item.isInContacts}
               isMsgReqSent={item.isMessageRequestSent}

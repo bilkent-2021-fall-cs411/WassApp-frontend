@@ -51,7 +51,6 @@ const Chat = (props) => {
     });
   };
 
-  console.log("CHAT RERENDER:", props.receiver);
   const handleNewMessage = useCallback(
     (msg) => {
       if (
@@ -82,7 +81,8 @@ const Chat = (props) => {
     const chatMessageListener = (data) => {
       handleNewMessage(data);
     };
-    replaceListener("message", chatMessageListener);
+
+    replaceListener("message", "chatMessageListener", chatMessageListener);
   }, [handleNewMessage]);
 
   return (

@@ -33,7 +33,6 @@ const ChatList = (props) => {
   const handleChatDelete = (contact) => {
     deleteChatHistory(contact, (res) => {
       if (String(res.status).startsWith("2")) {
-        console.log("CHAT F***ING DELETED?!?!?!?");
         getChatList();
       }
     });
@@ -54,11 +53,9 @@ const ChatList = (props) => {
   };
 
   const getChatList = () => {
-    console.log("START WHAT THE F***?");
     getChats((data) => {
       if (String(data.status).startsWith("2")) {
         setChats(data.data);
-        console.log("WHAT THE F***?");
         setNotifications(
           data.data.reduce((map, chat) => {
             map[chat.otherUser.email] = chat.unreadMessages;
@@ -77,21 +74,20 @@ const ChatList = (props) => {
             chat.otherUser.email === message.sender ||
             chat.otherUser.email === message.receiver
         );
-        console.log("OldChatIndex:", oldChatIndex);
+
         if (oldChatIndex === -1) {
-          console.log("OldChatIndex:", oldChatIndex);
-          console.log("I DON'T KNOW WHAT THE FUCK IS HAPPENING");
           getChatList();
           return [];
         }
         const oldChat = oldChats[oldChatIndex];
-        oldChat.lastMessage = message;
+        const newChat = {
+          ...oldChat,
+          lastMessage: message,
+        };
 
-        oldChats.splice(oldChatIndex, 1);
-        return [...oldChats, oldChat];
+        return [...oldChats.filter((_, i) => i !== oldChatIndex), newChat];
       });
 
-      console.log("TESTING", selectedChat.otherUser, message);
       if (
         selectedChat &&
         (selectedChat.otherUser.email === message.sender ||
@@ -105,11 +101,15 @@ const ChatList = (props) => {
         [message.sender]: (oldNotifications[message.sender] || 0) + 1,
       }));
     };
-    replaceListener("message", chatListMessageListener);
+
+    replaceListener(
+      "message",
+      "chatListMessageListener",
+      chatListMessageListener
+    );
   }, [selectedChat]);
 
   useEffect(() => {
-    console.log("INITIAL F*** CALL");
     getChatList();
   }, []);
 

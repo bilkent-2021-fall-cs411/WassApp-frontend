@@ -35,7 +35,7 @@ const Landing = () => {
 
   const handleContactMessage = (contact) => {
     setReceiver(contact);
-    getChatContent(contact);
+    getChatContent(contact.email);
   };
 
   const getChatContent = (contact) => {
@@ -57,7 +57,6 @@ const Landing = () => {
     login(window.sessionStorage.email, window.sessionStorage.password);
 
     getUserDetails((data) => {
-      console.log(data);
       if (String(data.status).startsWith("2")) {
         setCurrentUser(data.data);
       }
