@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, TextField, Button } from "@material-ui/core";
 import { Link, withRouter, useHistory } from "react-router-dom";
-import { register } from "~/service";
+import { login, register } from "~/service";
 
 const SignUp = () => {
   const history = useHistory();
@@ -12,12 +12,10 @@ const SignUp = () => {
       displayName: e.target.name.value,
       password: e.target.password.value,
     };
-    register(user, (res) => {
-      handleRegister(res);
+    register(user, () => {
+      login(user.email, user.password);
+      history.push("/landing");
     });
-  };
-  const handleRegister = () => {
-    history.push("/chat-list");
   };
   return (
     <div className="root-container ">
